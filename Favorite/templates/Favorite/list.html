@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load food_resize_img %}
+
+{% block title %}Favoris{% endblock %}
+
+{% block content %}
+<section class="page-section bg-primary" id="head-section">
+    <div class="col-lg-12 text-center text-white">
+        <h1 class="text-uppercase">Mes aliments</h1>
+        <hr class="divider my-4">
+    </div>
+</section>
+
+<section class="page-section" id="results">
+  <div class="container">
+    <div class="row">
+        {% for f in favorites %}
+            <div class="col-lg-4 text-center favorite">
+                <div class="img-container">
+                    {% if f.substitute.nutrition_grade in 'A,B'|make_list %}
+                    <p class="nutriscore good-nutriscore text-white">
+                    {% elif f.substitute.nutrition_grade in 'C,D'|make_list %}
+                    <p class="nutriscore not-so-bad-nutriscore text-white">
+                    {% elif f.substitute.nutrition_grade == 'E' %}
+                    <p class="nutriscore awful-nutriscore bg-danger text-white">
+                    {% else %}
+                    <p class="nutriscore">
+                    {% endif %}
+                        {{ f.substitute.nutrition_grade }}
+                    </p>
+                    <a href="{% url "food:product" substitute_barcode=f.substitute.barcode substituted_barcode=f.substituted.barcode %}">
+                        <img class="product-img" src="{{ f.substitute.img|resize_img:200 }}" alt="">
+                        <p class="product-name">{{ f.substitute.name|safe }}</p>
+                    </a>
+                    <div class="row">
+                        <div class="col-lg-12 text-center delete-product">
+                            <form class="delete" style="display: inline-block;" action="{% url "favorite:delete" %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="substitute" value="{{ f.substitute.barcode }}"/>
+                                <input type="hidden" name="substituted" value="{{ f.substituted.barcode }}"/>
+                                <input type="submit" class="btn btn-danger" value="Supprimer" />
+                            </form>
+                      </div>
+                    </div>
+                    <hr class="divider my-1">
+                </div>
+            </div>
+        {% empty %}
+        <div class="col-lg-12 ml-auto text-center">
+            <div id="no-result" class="alert alert-warning" role="alert"><h2>Pas de substitut trouvé</h2></div>
+        </div>
+        {% endfor %}
+
+    </div>
+</section>
+
+
+{% endblock %}
+
+{% block bottom_scripts %}
+    <script src="{% static "js/delete-form.js" %}"></script>
+{% endblock %}

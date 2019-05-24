@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load food_resize_img %}
+
+{% block title %}Résultats{% endblock %}
+
+{% block content %}
+<section id="products-head-section" class="page-section bg-primary" id="head-section">
+    <div class="col-lg-12 text-center text-white">
+        <h1 class="text-uppercase">Vous pouvez remplacer cet aliment par :</h1>
+        <hr class="divider my-4">
+    </div>
+</section>
+
+<section class="page-section" id="results">
+  <div class="container">
+    <div class="row">
+        {% for s in substitutes %}
+            <div class="col-lg-4 text-center">
+                <div class="img-container">
+                    {% if s.nutrition_grade in 'A,B'|make_list %}
+                    <p class="nutriscore good-nutriscore text-white">
+                    {% elif s.nutrition_grade in 'C,D'|make_list %}
+                    <p class="nutriscore not-so-bad-nutriscore text-white">
+                    {% elif s.nutrition_grade == 'E' %}
+                    <p class="nutriscore awful-nutriscore bg-danger text-white">
+                    {% else %}
+                    <p class="nutriscore">
+                    {% endif %}
+                        {{ s.nutrition_grade }}
+                    </p>
+                    <a href="{% url "food:product" substitute_barcode=s.barcode substituted_barcode=substituted.barcode %}">
+                        <img class="product-img" src="{{ s.img|resize_img:400 }}" alt="">
+                        <p class="product-name">{{ s.name|safe }}</p>
+                    </a>
+                    {% if user.is_authenticated %}
+                    <div class="row">
+                        <div class="col-lg-12 text-center save-product">
+                            <form class="save" style="display: inline-block;" action="{% url "favorite:save" %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="substitute" value="{{ s.barcode }}"/>
+                                <input type="hidden" name="substituted" value="{{ substituted.barcode }}"/>
+                                {% if s.is_favorite %}
+                                <input type="submit" class="btn btn-success" disabled=True value="Sauvegardé" />
+                                {% else %}
+                                <input type="submit" class="btn btn-primary" value="Sauvegarder" />
+                                {% endif %}
+                            </form>
+                      </div>
+                    </div>
+                    <hr class="divider my-1">
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+        <div class="col-lg-12 ml-auto text-center">
+            <div id="no-result" class="alert alert-warning" role="alert"><h2>Pas de substitut trouvé</h2></div>
+        </div>
+        {% endfor %}
+
+    </div>
+</section>
+{% endblock %}
+
+{% block bottom_scripts %}
+    <script src="{% static "js/save-form.js" %}"></script>
+{% endblock %}

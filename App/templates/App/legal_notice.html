@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mentions légales{% endblock %}
+
+{% block content %}
+<!-- Masthead -->
+<header class="masthead">
+    <div class="container h-100">
+      <div class="row h-100 align-items-center justify-content-center text-center">
+          <div class="col-lg-10 align-self-end">
+            <h1 class="text-uppercase text-white font-weight-bold">Mentions légales</h1>
+            <hr class="divider my-4">
+          </div>
+          <div class="col-lg-8 text-left text-white-50 mb-4">
+            <p>Le présent site web a été réalisé par <a target="_blank" href="https://www.linkedin.com/in/SebDeclercq">Sébastien <span class="caps">Declercq</span></a> pour la société PurBeurre. Le code source est <a target="_blank" href="https://github.com/SebDeclercq/OC_Projet_8/">disponible ici</a>.</p>
+            <p>Afin de générer ce site, différents éléments suivants ont été récupérés :</p>
+            <dl id="legal-notices">
+                <dt>L'icône de la carotte.</dt><dd>Créée par <a target="_blank" href="https://thenounproject.com/term/carrot/29691/">Fabien <span class="caps">Jouin</span></a>.</dd>
+                <dt>Les images de Remy et Colette.</dt><dd>Fournies par <a target="_blank" href="https://company-82435.frontify.com/d/6Yy9WFJdtp8j/pur-beurre-style-guide#/introduction/Notre-identit%C3%A9">OpenClassRooms</a> dans une perspective pédagogique.</dd>
+                <dt>Les polices de caractères.</dt><dd>Tirées de <a target="_blank" href="https://fonts.google.com/">Google Fonts.</a></dd>
+                <dt>Le <em>template</em>.</dt><dd>Adapté de <a target="_blank" href="https://github.com/BlackrockDigital/startbootstrap-creative">Start Bootstrap Creative.</a></dd>
+                <dt>Divers scripts JavaScript.</dt><dd>Se référer aux mentions légales présentes dans les fichiers respectifs.</dd>
+            </dl>
+            <p>Aucune donnée personnelle n'est exploitée par ce site, hormis les adresses emails et prénoms des membres inscrits. Actuellement, ces données servent strictement et uniquement au bon fonctionnement du site web. Ce comportement est susceptible de changer, selon la politique qu'établira PurBeurre. Toute modification de cette clause vous sera communiquée et soumise à votre validation formelle.</p>
+        </div>
+      </div>
+    </div>
+</header>
+{% endblock %}

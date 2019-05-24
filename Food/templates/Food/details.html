@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+{% load food_resize_img %}
+
+{% block title %}Fiche produit{% endblock %}
+
+{% block content %}
+<section class="page-section bg-primary" id="picture" style="background-image: url('{{ substitute.img }}');">
+  <div class="container">
+    <div class="row justify-content-center" id="product-name">
+      <div class="col-lg-8 text-center">
+        <h1 class="mt-0 text-primary">{{ substitute.name|safe|capfirst }}</h1>
+        <hr class="divider my-4">
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page-section" id="product">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-4 ml-auto text-center">
+        <img class="details-img" src="https://static.openfoodfacts.org/images/misc/nutriscore-{{ substitute.nutrition_grade|lower }}.png" alt="">
+      </div>
+      <div class="col-lg-4 mr-auto text-center">
+          <img class="details-img" src="{{ substitute.nutrition_img|resize_img:400 }}" alt="">
+      </div>
+    </div>
+    <div class="row flex-d justify-content-center" id="url-off">
+        <div class="text-primary text-center" id="off-link-container">
+            <h3><a id="off-link" href="{{ substitute.url }}"
+                target="_blank">Voir la fiche d'OpenFoodFacts</a></h3>
+        </div>
+  </div>
+  {% if user.is_authenticated %}
+  <div class="row" id="save-product">
+      <div class="col-lg-12 text-center">
+          <form class="save" style="display: inline-block;" action="{% url "favorite:save" %}" method="POST">
+              {% csrf_token %}
+              <input type="hidden" name="substitute" value="{{ substitute.barcode }}"/>
+              <input type="hidden" name="substituted" value="{{ substituted.barcode }}"/>
+              {% if is_favorite %}
+              <input type="submit" class="btn btn-success" disabled=True value="Sauvegardé" />
+              {% else %}
+              <input type="submit" class="btn btn-primary" value="Sauvegarder" />
+              {% endif %}
+          </form>
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block bottom_scripts %}
+    <script src="{% static "js/save-form.js" %}"></script>
+{% endblock %}
