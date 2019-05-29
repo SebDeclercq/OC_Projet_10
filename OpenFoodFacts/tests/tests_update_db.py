@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
+from typing import Any, Dict, Sequence
 import os
+import tempfile
 import types
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import override_settings, TestCase
+import pandas as pd
 import responses
 from Food.models import Product
-from OpenFoodFacts.update_db import FoodDbUpdater
+from OpenFoodFacts.update_db import CsvData, FoodDbUpdater
 
 
 class TestUpdateCommand(TestCase):
@@ -20,6 +23,18 @@ class TestUpdateCommand(TestCase):
 class TestFoodDbUpdater(TestCase):
     def setUp(self) -> None:
         self.db_updater: FoodDbUpdater = FoodDbUpdater()
+        self.csv_header: Sequence[str] = (
+            'code', 'product_name', 'nutrition_grade', 'url', 'image_url'
+        )
+        self.csv_data: Sequence[Sequence[str]] = (
+            ('123', 'Product 1', 'B', 'www.url1.org', 'www.img1.com'),
+            ('346', 'Product 2', 'A', 'www.url2.org', ''),
+        )
+        self.csv_content: str = '\n'.join((
+            self.db_updater.csv_separator.join(self.csv_header),
+            *[self.db_updater.csv_separator.join(row)
+                for row in self.csv_data]
+        ))
 
     def test_init(self) -> None:
         db_updater: FoodDbUpdater = FoodDbUpdater(csv_separator=';')
@@ -30,13 +45,13 @@ class TestFoodDbUpdater(TestCase):
     @responses.activate
     def test_get_off_csv_file(self) -> None:
         responses.add(responses.GET, self.db_updater.off_csv_url,
-                      status=200, body='Hello World')
+                      status=200, body=self.csv_content)
         self.db_updater.get_off_csv_file()
         self.assertTrue(os.path.isfile(self.db_updater.off_csv_file))
         self.assertGreater(os.path.getsize(self.db_updater.off_csv_file), 0)
         with open(self.db_updater.off_csv_file) as csv_fhandle:
             content: str = csv_fhandle.read()
-        self.assertEqual('Hello World', content)
+        self.assertEqual(self.csv_content, content)
 
     @responses.activate
     def test_get_off_csv_file_error_404(self) -> None:
@@ -50,3 +65,26 @@ class TestFoodDbUpdater(TestCase):
                                    nutrition_grade='A', url=f'www.url{i}.org')
         self.assertIsInstance(self.db_updater.products, types.GeneratorType)
         self.assertIsInstance(next(self.db_updater.products), Product)
+
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    def test_get_product_data_in_csv(self) -> None:
+        temp_filename: str = os.path.join(
+            tempfile.gettempdir(), self.db_updater.off_csv_file
+        )
+        with open(temp_filename, 'w') as temp_file:
+            temp_file.write(self.csv_content)
+        product_2: Product = Product.objects.create(
+            barcode=346, name='Product 2', nutrition_grade='B',
+            url='www.old_url.com'
+        )
+        self.db_updater.full_data = pd.read_csv(
+            temp_filename, sep=self.db_updater.csv_separator
+        )
+        dict_data: Dict[str, Any] = dict(zip(
+            self.csv_header, self.csv_data[1]
+        ))
+        for key, val in dict_data.items():
+            if not val:
+                dict_data[key] = None
+        self.assertEqual(CsvData(**dict_data),
+                         self.db_updater.get_product_data(product_2))
