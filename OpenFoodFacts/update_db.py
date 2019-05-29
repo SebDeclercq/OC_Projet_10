@@ -74,7 +74,15 @@ class FoodDbUpdater:
             raise ProductNotFoundError(
                 f'{product.name} ({product.barcode}) not found in csv file'
             )
+        else:
+            raise TooManyProducts(
+                f'{product.name} ({product.barcode}) found '
+                ' times in csv file'
+            )
 
 
 class ProductNotFoundError(Exception):
+    pass
+
+class TooManyProducts(Exception):
     pass

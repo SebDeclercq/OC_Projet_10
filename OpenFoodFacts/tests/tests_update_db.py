@@ -10,7 +10,7 @@ import pandas as pd
 import responses
 from Food.models import Product
 from OpenFoodFacts.update_db import (CsvData, FoodDbUpdater,
-                                     ProductNotFoundError)
+                                     ProductNotFoundError, TooManyProducts)
 import Food  # noqa
 
 
@@ -109,3 +109,18 @@ class TestFoodDbUpdater(TestCase):
         unknown_product: Product = Product(barcode='not_found')
         with self.assertRaises(ProductNotFoundError):
             self.db_updater.get_product_data(unknown_product)
+
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    def test_too_many_products_data_in_csv(self) -> None:
+        temp_filename: str = os.path.join(
+            tempfile.gettempdir(), self.db_updater.off_csv_file
+        )
+        with open(temp_filename, 'w') as temp_file:
+            temp_file.write(self.csv_content + '\n')
+            temp_file.write(self.csv_content)
+        self.db_updater.full_data = pd.read_csv(
+            temp_filename, sep=self.db_updater.csv_separator
+        )
+        product: Product = Product(barcode='346')
+        with self.assertRaises(TooManyProducts):
+            self.db_updater.get_product_data(product)
