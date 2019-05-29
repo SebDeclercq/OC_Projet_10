@@ -1,7 +1,6 @@
 from typing import List, Sequence
 from django.test import TestCase
-from .management.commands.init_food_db import Command
-from .api import API, Product
+from OpenFoodFacts.api import API, Product
 
 
 class TestAPI(TestCase):

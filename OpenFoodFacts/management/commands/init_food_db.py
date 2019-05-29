@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-from typing import Any, Dict, List
-import time
+from typing import Any, List
 from django.core.management.base import (BaseCommand, CommandError,
                                          CommandParser)
 from django.db.utils import IntegrityError
