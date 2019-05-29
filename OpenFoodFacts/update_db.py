@@ -77,7 +77,7 @@ class FoodDbUpdater:
         else:
             raise TooManyProducts(
                 f'{product.name} ({product.barcode}) found '
-                ' times in csv file'
+                '{len(data)} times in csv file'
             )
 
 
