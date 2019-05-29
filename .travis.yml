@@ -1,0 +1,17 @@
+language: python
+python:
+    - '3.7'
+before_script:
+    - pip install pipenv
+    - pipenv install --dev
+env:
+    - DB_USER='user'
+    - DB_PASS='pass'
+    - DJANGO_SETTINGS_MODULE='PurBeurre.settings'
+services:
+    - postgresql
+script:
+    - pipenv run python manage.py test
+branches:
+    only:
+        - staging
