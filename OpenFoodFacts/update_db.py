@@ -26,4 +26,4 @@ class FoodDbUpdater:
             with open(self.off_csv_file, 'w') as csv_fhandle:
                 csv_fhandle.write(resp.text)
         else:
-            raise Exception('oops')
+            raise FileNotFoundError(f'{self.off_csv_url} is unavailable')

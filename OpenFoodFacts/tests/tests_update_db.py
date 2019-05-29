@@ -37,3 +37,9 @@ class TestFoodDbUpdater(TestCase):
         with open(self.db_updater.off_csv_file) as csv_fhandle:
             content: str = csv_fhandle.read()
         self.assertEqual('Hello World', content)
+
+    @responses.activate
+    def test_get_off_csv_file_error_404(self) -> None:
+        responses.add(responses.GET, self.db_updater.off_csv_url, status=404)
+        with self.assertRaises(FileNotFoundError):
+            self.db_updater.get_off_csv_file()
