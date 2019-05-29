@@ -70,3 +70,11 @@ class FoodDbUpdater:
         ]
         if len(data) == 1:
             return DataConverter.csv_data_to_obj(data)
+        elif len(data) == 0:
+            raise ProductNotFoundError(
+                f'{product.name} ({product.barcode}) not found in csv file'
+            )
+
+
+class ProductNotFoundError(Exception):
+    pass

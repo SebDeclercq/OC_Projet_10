@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from typing import Any, Dict, Sequence
+from unittest import mock
 import os
 import tempfile
 import types
@@ -8,7 +9,9 @@ from django.test import override_settings, TestCase
 import pandas as pd
 import responses
 from Food.models import Product
-from OpenFoodFacts.update_db import CsvData, FoodDbUpdater
+from OpenFoodFacts.update_db import (CsvData, FoodDbUpdater,
+                                     ProductNotFoundError)
+import Food  # noqa
 
 
 class TestUpdateCommand(TestCase):
@@ -73,7 +76,7 @@ class TestFoodDbUpdater(TestCase):
         )
         with open(temp_filename, 'w') as temp_file:
             temp_file.write(self.csv_content)
-        product_2: Product = Product.objects.create(
+        product_2: Product = Product(
             barcode=346, name='Product 2', nutrition_grade='B',
             url='www.old_url.com'
         )
@@ -88,3 +91,21 @@ class TestFoodDbUpdater(TestCase):
                 dict_data[key] = None
         self.assertEqual(CsvData(**dict_data),
                          self.db_updater.get_product_data(product_2))
+
+    def test_no_data_at_all(self) -> None:
+        with self.assertRaises(ValueError):
+            self.db_updater.get_product_data(Product())
+
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
+    def test_no_product_data_in_csv(self) -> None:
+        temp_filename: str = os.path.join(
+            tempfile.gettempdir(), self.db_updater.off_csv_file
+        )
+        with open(temp_filename, 'w') as temp_file:
+            temp_file.write(self.csv_content)
+        self.db_updater.full_data = pd.read_csv(
+            temp_filename, sep=self.db_updater.csv_separator
+        )
+        unknown_product: Product = Product(barcode='not_found')
+        with self.assertRaises(ProductNotFoundError):
+            self.db_updater.get_product_data(unknown_product)
