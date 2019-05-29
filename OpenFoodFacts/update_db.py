@@ -2,6 +2,8 @@
 from dataclasses import dataclass
 import os
 import tempfile
+from requests.models import Response
+import requests
 
 
 @dataclass
@@ -17,3 +19,11 @@ class FoodDbUpdater:
 
     def run(self) -> None:
         ...
+
+    def get_off_csv_file(self) -> None:
+        resp: Response = requests.get(self.off_csv_url)
+        if resp.status_code == 200:
+            with open(self.off_csv_file, 'w') as csv_fhandle:
+                csv_fhandle.write(resp.text)
+        else:
+            raise Exception('oops')

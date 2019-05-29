@@ -8,6 +8,7 @@ mypy = "*"
 flake8 = "*"
 ipython = "*"
 django-stubs = "*"
+responses = "*"
 
 [packages]
 django = "*"
