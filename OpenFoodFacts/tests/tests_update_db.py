@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import os
-from unittest import mock
+import types
 from django.core.management import call_command
 from django.test import TestCase
-import requests
 import responses
+from Food.models import Product
 from OpenFoodFacts.update_db import FoodDbUpdater
 
 
@@ -43,3 +43,10 @@ class TestFoodDbUpdater(TestCase):
         responses.add(responses.GET, self.db_updater.off_csv_url, status=404)
         with self.assertRaises(FileNotFoundError):
             self.db_updater.get_off_csv_file()
+
+    def test_get_product_ids_in_db(self) -> None:
+        for i in range(3):
+            Product.objects.create(barcode=i, name=f'Product {i}',
+                                   nutrition_grade='A', url=f'www.url{i}.org')
+        self.assertIsInstance(self.db_updater.products, types.GeneratorType)
+        self.assertIsInstance(next(self.db_updater.products), Product)

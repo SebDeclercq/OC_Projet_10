@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 from dataclasses import dataclass
+from typing import Iterator
 import os
 import tempfile
 from requests.models import Response
 import requests
+from Food.models import Product
 
 
 @dataclass
@@ -27,3 +29,8 @@ class FoodDbUpdater:
                 csv_fhandle.write(resp.text)
         else:
             raise FileNotFoundError(f'{self.off_csv_url} is unavailable')
+
+    @property
+    def products(self) -> Iterator[Product]:
+        for product in Product.objects.all():
+            yield product
