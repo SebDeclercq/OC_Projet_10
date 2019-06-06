@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import Any, Dict, Sequence
+from typing import Any, Dict, List, Sequence
 import os
 import tempfile
 from django.core.management import call_command
@@ -30,7 +30,7 @@ class TestFoodDbUpdater(TestCase):
         )
         self.csv_data: Sequence[Sequence[str]] = (
             ('123', 'Product 1', 'B', 'www.url1.org', 'www.img1.com'),
-            ('456', 'Product 2', 'A', 'www.url2.org', ''),
+            ('456', 'Product 2', 'A', 'www.url2.org', 'www.img2.com'),
             ('789', 'Product 3', 'C', 'www.url3.org', 'www.img3.com'),
         )
         for (barcode, name, grade, url, _) in self.csv_data[:3]:
@@ -86,6 +86,7 @@ class TestFoodDbUpdater(TestCase):
             p.barcode: p for p in Product.objects.all()[:2]
         }
         self.db_updater.products[self.csv_data[0][0]].name = 'OLD PRODUCT NAME'
+        full_data: List[CsvData] = list(self.db_updater.get_products_data())
         for data in self.csv_data[:2]:
             dict_data: Dict[str, Any] = dict(zip(
                 self.csv_header, data
@@ -93,8 +94,7 @@ class TestFoodDbUpdater(TestCase):
             for key, val in dict_data.items():
                 if not val:
                     dict_data[key] = None
-            self.assertEqual(CsvData(**dict_data),
-                             next(self.db_updater.get_products_data()))
+            self.assertIn(CsvData(**dict_data), full_data)
 
     # @override_settings(MEDIA_ROOT=tempfile.gettempdir())
     # def test_get_product_data_in_csv(self) -> None:

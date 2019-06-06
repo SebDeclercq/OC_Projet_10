@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from dataclasses import dataclass, field, fields
-from typing import Any, Dict, Iterator, Sequence
+from typing import Any, Dict, Iterator, Set
 import csv
 import os
 import tempfile
@@ -65,7 +65,7 @@ class FoodDbUpdater:
                     yield DataConverter.csv_data_to_obj(raw_data)
 
     def _extract_useful_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        useful_keys: Sequence[str] = (f.name for f in fields(CsvData))
+        useful_keys: Set[str] = {f.name for f in fields(CsvData)}
         result: Dict[str, Any] = {}
         for key, val in data.items():
             if key in useful_keys:
