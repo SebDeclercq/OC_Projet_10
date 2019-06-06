@@ -41,11 +41,14 @@ class FoodDbUpdater:
             self.update_product(product, csv_data)
 
     def get_off_csv_file(self) -> None:
-        resp: Response = requests.get(self.off_csv_url)
-        if resp.status_code == 200:
-            with open(self.off_csv_file, 'w') as csv_fhandle:
-                csv_fhandle.write(resp.text)
-        else:
+        try:
+            with requests.get(self.off_csv_url, stream=True) as resp:
+                resp.raise_for_status()
+                with open(self.off_csv_file, 'wb') as csv_fhandle:
+                    for chunk in resp.iter_content(chunk_size=8192):
+                        if chunk:
+                            csv_fhandle.write(chunk)
+        except requests.exceptions.HTTPError:
             raise FileNotFoundError(f'{self.off_csv_url} is unavailable')
 
     def get_products(self) -> Dict[str, Product]:
