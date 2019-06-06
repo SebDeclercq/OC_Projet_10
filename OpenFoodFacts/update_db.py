@@ -64,7 +64,8 @@ class FoodDbUpdater:
             for raw_data in off_data:
                 barcode: str = raw_data['code']
                 if barcode in self.products:
-                    yield (self.products[barcode], CsvData(**raw_data))
+                    yield (self.products[barcode],
+                           CsvData(**self._extract_useful_data(raw_data)))
 
     def _extract_useful_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
         useful_keys: Set[str] = {f.name for f in fields(CsvData)}
