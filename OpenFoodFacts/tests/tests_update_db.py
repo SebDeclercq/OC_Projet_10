@@ -100,10 +100,14 @@ class TestFoodDbUpdater(TestCase):
 
     def test_update_product(self) -> None:
         product: Product = Product.objects.filter(barcode='123')[0]
+        old_url: str = product.url
+        old_img: str = product.img
         data: CsvData = CsvData(
             '123', 'Product 1', 'A', 'www.new_url1.org', 'www.new_img1.com'
         )
         self.db_updater.update_product(product, data)
         updated_product: Product = Product.objects.filter(barcode='123')[0]
-        self.assertNotEqual(product.url, updated_product.url)
-        self.assertNotEqual(product.img, updated_product.img)
+        self.assertNotEqual(old_url, updated_product.url)
+        self.assertNotEqual(old_img, updated_product.url)
+        self.assertEqual(data.url, updated_product.url)
+        self.assertEqual(data.image_url, updated_product.img)

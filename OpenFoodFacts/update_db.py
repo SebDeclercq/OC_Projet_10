@@ -77,3 +77,4 @@ class FoodDbUpdater:
     def update_product(self, product: Product, data: CsvData) -> None:
         for csv_attr, db_attr in self.matching_csv_db.items():
             setattr(product, db_attr, getattr(data, csv_attr))
+            product.save()
