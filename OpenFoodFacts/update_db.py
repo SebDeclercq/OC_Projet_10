@@ -55,3 +55,11 @@ class FoodDbUpdater:
             for raw_data in off_data:
                 if raw_data['code'] in self.products:
                     yield CsvData(**raw_data)
+
+    def _extract_useful_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        useful_keys: Set[str] = {f.name for f in fields(CsvData)}
+        result: Dict[str, Any] = {}
+        for key, val in data.items():
+            if key in useful_keys:
+                result[key] = val
+        return result
