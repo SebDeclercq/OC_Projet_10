@@ -9,5 +9,7 @@ class Command(BaseCommand):
                  'to update the Food DB records')
 
     def handle(self, *args: Any, **options: Any) -> None:
+        print('Starting up the database update')
         food_db_updater: FoodDbUpdater = FoodDbUpdater()
         food_db_updater.run()
+        print('Update complete')
