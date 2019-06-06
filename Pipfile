@@ -9,6 +9,7 @@ flake8 = "*"
 ipython = "*"
 django-stubs = "*"
 responses = "*"
+sentry-sdk = "==0.8.0"
 
 [packages]
 django = "*"
@@ -16,7 +17,6 @@ coverage = "*"
 requests = "*"
 gunicorn = "*"
 django-heroku = "*"
-pandas = "*"
 
 [requires]
 python_version = "3.7"
