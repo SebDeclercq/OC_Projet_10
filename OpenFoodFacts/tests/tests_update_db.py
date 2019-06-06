@@ -69,10 +69,6 @@ class TestFoodDbUpdater(TestCase):
             self.assertIn(product.barcode, self.db_updater.products.keys())
             self.assertIn(product, self.db_updater.products.values())
 
-    def _test_extract_useful_data(self) -> None:
-        data: Dict[str, str] = {'code': 'azer', 'fake': 'ty'}
-        self.assertEqual(1, len(self.db_updater._extract_useful_data(data)))
-
     @override_settings(MEDIA_ROOT=tempfile.gettempdir())
     def test_get_products_data_in_csv(self) -> None:
         temp_filename: str = os.path.join(
