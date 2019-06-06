@@ -35,7 +35,10 @@ class FoodDbUpdater:
         return os.path.join(self.tmp_dir, self.output_file)
 
     def run(self) -> None:
-        ...
+        self.get_off_csv_file()
+        self.get_products()
+        for (product, csv_data) in self.get_products_data():
+            self.update_product(product, csv_data)
 
     def get_off_csv_file(self) -> None:
         resp: Response = requests.get(self.off_csv_url)
@@ -51,7 +54,6 @@ class FoodDbUpdater:
         return self.products
 
     def get_products_data(self) -> Iterator[Tuple[Product, CsvData]]:
-        self.get_products()
         with open(self.off_csv_file) as off_file:
             off_data: Any = csv.DictReader(
                 off_file, delimiter=self.csv_separator
