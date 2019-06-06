@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from typing import Any, Dict, List, Sequence, Tuple
+from unittest import skip
 import os
 import tempfile
 from django.core.management import call_command
@@ -12,6 +13,7 @@ import OpenFoodFacts  # noqa
 
 
 class TestUpdateCommand(TestCase):
+    @skip('Real life test w/ OpenFoodFacts CSV file too heavy')
     def test_update_db(self) -> None:
         try:
             call_command('update_food_db')
