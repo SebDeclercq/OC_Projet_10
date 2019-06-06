@@ -79,13 +79,9 @@ class TestFoodDbUpdater(TestCase):
         self.db_updater.products = {
             p.barcode: p for p in Product.objects.all()[:2]
         }
-        self.db_updater.products[self.csv_data[0][0]].name = 'OLD PRODUCT NAME'
         full_data: List[CsvData] = list(self.db_updater.get_products_data())
         for data in self.csv_data[:2]:
             dict_data: Dict[str, Any] = dict(zip(
                 self.csv_header, data
             ))
-            for key, val in dict_data.items():
-                if not val:
-                    dict_data[key] = None
             self.assertIn(CsvData(**dict_data), full_data)
