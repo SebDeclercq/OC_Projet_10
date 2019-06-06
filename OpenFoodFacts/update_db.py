@@ -25,6 +25,10 @@ class FoodDbUpdater:
     tmp_dir: str = tempfile.gettempdir()
     output_file: str = 'off.products.csv'
     products: Dict[str, Product] = field(default_factory=dict)
+    matching_csv_db: Dict[str, str] = field(default_factory=lambda: {
+        'code': 'barcode', 'product_name': 'name',
+        'nutrition_grade': 'nutrition_grade', 'url': 'url', 'image_url': 'img'
+    })
 
     @property
     def off_csv_file(self) -> str:
@@ -64,3 +68,7 @@ class FoodDbUpdater:
             if key in useful_keys:
                 result[key] = val
         return result
+
+    def update_product(self, product: Product, data: CsvData) -> None:
+        for csv_attr, db_attr in self.matching_csv_db.items():
+            setattr(product, db_attr, getattr(data, csv_attr))

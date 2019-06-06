@@ -95,3 +95,13 @@ class TestFoodDbUpdater(TestCase):
             self.assertIn(CsvData(**dict_data), csv_data)
         for product in Product.objects.all()[:2]:
             self.assertIn(product, products)
+
+    def test_update_product(self) -> None:
+        product: Product = Product.objects.filter(barcode='123')[0]
+        data: CsvData = CsvData(
+            '123', 'Product 1', 'A', 'www.new_url1.org', 'www.new_img1.com'
+        )
+        self.db_updater.update_product(product, data)
+        updated_product: Product = Product.objects.filter(barcode='123')[0]
+        self.assertNotEqual(product.url, updated_product.url)
+        self.assertNotEqual(product.img, updated_product.img)
