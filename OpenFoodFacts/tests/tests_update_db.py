@@ -4,11 +4,9 @@ import os
 import tempfile
 from django.core.management import call_command
 from django.test import override_settings, TestCase
-import pandas as pd
-import responses
+import responses  # type: ignore
 from Food.models import Product
-from OpenFoodFacts.update_db import (CsvData, FoodDbUpdater,
-                                     ProductNotFoundError, TooManyProducts)
+from OpenFoodFacts.update_db import CsvData, FoodDbUpdater
 import Food  # noqa
 import OpenFoodFacts  # noqa
 
@@ -95,59 +93,3 @@ class TestFoodDbUpdater(TestCase):
                 if not val:
                     dict_data[key] = None
             self.assertIn(CsvData(**dict_data), full_data)
-
-    # @override_settings(MEDIA_ROOT=tempfile.gettempdir())
-    # def test_get_product_data_in_csv(self) -> None:
-    #     temp_filename: str = os.path.join(
-    #         tempfile.gettempdir(), self.db_updater.off_csv_file
-    #     )
-    #     with open(temp_filename, 'w') as temp_file:
-    #         temp_file.write(self.csv_content)
-    #     product_2: Product = Product(
-    #         barcode=346, name='Product 2', nutrition_grade='B',
-    #         url='www.old_url.com'
-    #     )
-    #     self.db_updater.full_data = pd.read_csv(
-    #         temp_filename, sep=self.db_updater.csv_separator
-    #     )
-    #     dict_data: Dict[str, Any] = dict(zip(
-    #         self.csv_header, self.csv_data[1]
-    #     ))
-    #     for key, val in dict_data.items():
-    #         if not val:
-    #             dict_data[key] = None
-    #     self.assertEqual(CsvData(**dict_data),
-    #                      self.db_updater.get_product_data(product_2))
-    #
-    # def test_no_data_at_all(self) -> None:
-    #     with self.assertRaises(ValueError):
-    #         self.db_updater.get_product_data(Product())
-    #
-    # @override_settings(MEDIA_ROOT=tempfile.gettempdir())
-    # def test_no_product_data_in_csv(self) -> None:
-    #     temp_filename: str = os.path.join(
-    #         tempfile.gettempdir(), self.db_updater.off_csv_file
-    #     )
-    #     with open(temp_filename, 'w') as temp_file:
-    #         temp_file.write(self.csv_content)
-    #     self.db_updater.full_data = pd.read_csv(
-    #         temp_filename, sep=self.db_updater.csv_separator
-    #     )
-    #     unknown_product: Product = Product(barcode='not_found')
-    #     with self.assertRaises(ProductNotFoundError):
-    #         self.db_updater.get_product_data(unknown_product)
-    #
-    # @override_settings(MEDIA_ROOT=tempfile.gettempdir())
-    # def test_too_many_products_data_in_csv(self) -> None:
-    #     temp_filename: str = os.path.join(
-    #         tempfile.gettempdir(), self.db_updater.off_csv_file
-    #     )
-    #     with open(temp_filename, 'w') as temp_file:
-    #         temp_file.write(self.csv_content + '\n')
-    #         temp_file.write(self.csv_content)
-    #     self.db_updater.full_data = pd.read_csv(
-    #         temp_filename, sep=self.db_updater.csv_separator
-    #     )
-    #     product: Product = Product(barcode='346')
-    #     with self.assertRaises(TooManyProducts):
-    #         self.db_updater.get_product_data(product)

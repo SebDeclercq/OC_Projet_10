@@ -18,13 +18,6 @@ class CsvData:
     image_url: str
 
 
-class DataConverter:
-    @classmethod
-    def csv_data_to_obj(cls, data: Dict[str, Any]) -> CsvData:
-        result: Dict[str, Any] = {k: str(v) for k, v in data.items()}
-        return CsvData(**result)
-
-
 @dataclass
 class FoodDbUpdater:
     off_csv_url: str = 'https://fr.openfoodfacts.org/data/fr.openfoodfacts.org.products.csv'  # noqa
@@ -60,9 +53,8 @@ class FoodDbUpdater:
                 off_file, delimiter=self.csv_separator
             )
             for raw_data in off_data:
-                useful_data: Dict[str, Any] = self._extract_useful_data(raw_data)  # noqa
-                if useful_data['code'] in self.products:
-                    yield DataConverter.csv_data_to_obj(raw_data)
+                if raw_data['code'] in self.products:
+                    yield CsvData(**raw_data)
 
     def _extract_useful_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
         useful_keys: Set[str] = {f.name for f in fields(CsvData)}
@@ -71,29 +63,3 @@ class FoodDbUpdater:
             if key in useful_keys:
                 result[key] = val
         return result
-
-    # def get_product_data(self, product: Product) -> CsvData:
-    #     if self.full_data is None:
-    #         raise ValueError('No data found')
-    #     data: pd.Series = self.full_data.loc[
-    #         self.full_data.code == product.barcode
-    #     ]
-    #     if len(data) == 1:
-    #         return DataConverter.csv_data_to_obj(data)
-    #     elif len(data) == 0:
-    #         raise ProductNotFoundError(
-    #             f'{product.name} ({product.barcode}) not found in csv file'
-    #         )
-    #     else:
-    #         raise TooManyProducts(
-    #             f'{product.name} ({product.barcode}) found '
-    #             f'{len(data)} times in csv file'
-    #         )
-
-
-class ProductNotFoundError(Exception):
-    pass
-
-
-class TooManyProducts(Exception):
-    pass
