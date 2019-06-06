@@ -24,7 +24,7 @@ class TestFoodDbUpdater(TestCase):
     def setUp(self) -> None:
         self.db_updater: FoodDbUpdater = FoodDbUpdater()
         self.csv_header: Sequence[str] = (
-            'code', 'product_name', 'nutrition_grade', 'url', 'image_url'
+            'code', 'product_name', 'nutrition_grade_fr', 'url', 'image_url'
         )
         self.csv_data: Sequence[Sequence[str]] = (
             ('123', 'Product 1', 'B', 'www.url1.org', 'www.img1.com'),
