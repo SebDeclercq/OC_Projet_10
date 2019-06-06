@@ -4,7 +4,6 @@ from typing import Any, Dict, Iterator, Set, Tuple
 import csv
 import os
 import tempfile
-from requests.models import Response
 import requests
 from Food.models import Product
 
@@ -13,7 +12,7 @@ from Food.models import Product
 class CsvData:
     code: str
     product_name: str
-    nutrition_grade: str
+    nutrition_grade_fr: str
     url: str
     image_url: str
 
@@ -26,8 +25,8 @@ class FoodDbUpdater:
     output_file: str = 'off.products.csv'
     products: Dict[str, Product] = field(default_factory=dict)
     matching_csv_db: Dict[str, str] = field(default_factory=lambda: {
-        'code': 'barcode', 'product_name': 'name',
-        'nutrition_grade': 'nutrition_grade', 'url': 'url', 'image_url': 'img'
+        'code': 'barcode', 'product_name': 'name', 'image_url': 'img',
+        'nutrition_grade_fr': 'nutrition_grade', 'url': 'url',
     })
 
     @property
