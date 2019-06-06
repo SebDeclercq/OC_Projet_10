@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List, Sequence, Tuple
 import os
 import tempfile
 from django.core.management import call_command
@@ -83,9 +83,15 @@ class TestFoodDbUpdater(TestCase):
         self.db_updater.products = {
             p.barcode: p for p in Product.objects.all()[:2]
         }
-        full_data: List[CsvData] = list(self.db_updater.get_products_data())
+        full_data: List[Tuple[Product, CsvData]] = list(
+            self.db_updater.get_products_data()
+        )
+        products: Sequence[Product] = tuple(p for (p, _) in full_data)
+        csv_data: Sequence[CsvData] = tuple(c for (_, c) in full_data)
         for data in self.csv_data[:2]:
             dict_data: Dict[str, Any] = dict(zip(
                 self.csv_header, data
             ))
-            self.assertIn(CsvData(**dict_data), full_data)
+            self.assertIn(CsvData(**dict_data), csv_data)
+        for product in Product.objects.all()[:2]:
+            self.assertIn(product, products)

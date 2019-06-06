@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from dataclasses import dataclass, field, fields
-from typing import Any, Dict, Iterator, Set
+from typing import Any, Dict, Iterator, Set, Tuple
 import csv
 import os
 import tempfile
@@ -46,15 +46,16 @@ class FoodDbUpdater:
             self.products[product.barcode] = product
         return self.products
 
-    def get_products_data(self) -> Iterator[CsvData]:
+    def get_products_data(self) -> Iterator[Tuple[Product, CsvData]]:
         self.get_products()
         with open(self.off_csv_file) as off_file:
             off_data: Any = csv.DictReader(
                 off_file, delimiter=self.csv_separator
             )
             for raw_data in off_data:
-                if raw_data['code'] in self.products:
-                    yield CsvData(**raw_data)
+                barcode: str = raw_data['code']
+                if barcode in self.products:
+                    yield (self.products[barcode], CsvData(**raw_data))
 
     def _extract_useful_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
         useful_keys: Set[str] = {f.name for f in fields(CsvData)}
