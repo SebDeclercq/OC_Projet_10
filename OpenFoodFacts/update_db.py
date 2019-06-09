@@ -17,6 +17,9 @@ class CsvData:
     url: str
     image_url: str
 
+    @property
+    def nutrition_grade(self) -> str:
+        return self.nutrition_grade_fr.upper()
 
 @dataclass
 class FoodDbUpdater:
@@ -28,7 +31,7 @@ class FoodDbUpdater:
     products: Dict[str, Product] = field(default_factory=dict)
     matching_csv_db: Dict[str, str] = field(default_factory=lambda: {
         'code': 'barcode', 'product_name': 'name', 'image_url': 'img',
-        'nutrition_grade_fr': 'nutrition_grade', 'url': 'url',
+        'nutrition_grade': 'nutrition_grade', 'url': 'url',
     })
 
     @property
